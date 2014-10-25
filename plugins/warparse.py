@@ -1,4 +1,5 @@
 import re
+import time
 
 import pymysql
 
@@ -23,7 +24,6 @@ class WarparsePlugin:
         )
 
         self.cursor = self.conn.cursor()
-
         self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS `warparse_logs` (
                 `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
@@ -37,10 +37,26 @@ class WarparsePlugin:
                 PRIMARY KEY (`id`)
             );
         """)
+        self.conn.commit()
 
     def shutdown(self):
         self.cursor.close()
         self.conn.close()
+
+    def write_to_database(self, mtype, user, channel, network, num, info):
+        # Types:
+        # 1. CW
+        # 2. PCW
+        # 3. Ringer
+        # 4. Recruit
+        # 5. Message
+        a = self.cursor.execute("""
+            INSERT INTO `warparse_logs` (
+                `type`, `time`, `user`, `channel`, `network`, `num`, `info`
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s);
+        """, [mtype, int(time.time()), user, channel, network, int(num), info])
+        self.conn.commit()
+
 
     _CWRE = re.compile("\[CW\] #(.+) @ (.+) - (.+) - Requested a (\d+) vs "
                         "\d+(?: \(Additional info: (.+)\))?");
@@ -66,6 +82,8 @@ class WarparsePlugin:
             num = match.group(4)
             info = match.group(5)
 
+            self.write_to_database(1, user, channel, network, num, info)
+
             self.bot.say("CW: {} in #{} on {}. Wants {}. {}"
                          .format(user, channel, network, num, info))
             return
@@ -78,6 +96,8 @@ class WarparsePlugin:
             num = match.group(4)
             info = match.group(5)
 
+            self.write_to_database(2, user, channel, network, num, info)
+
             self.bot.say("PCW: {} in #{} on {}. Wants {}. {}"
                          .format(user, channel, network, num, info))
             return
@@ -89,6 +109,8 @@ class WarparsePlugin:
             user = match.group(3)
             num = match.group(4)
             info = match.group(5)
+
+            self.write_to_database(3, user, channel, network, num, info)
 
             self.bot.say("Ringer: {} in #{} on {}. Wants {}. {}"
                          .format(user, channel, network, num, info))
