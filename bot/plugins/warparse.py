@@ -59,11 +59,12 @@ class WarparsePlugin:
 
 
     _CWRE = re.compile("\[CW\] #(.+) @ (.+) - (.+) - Requested a (\d+) vs "
-                        "\d+(?: \(Additional info: (.+)\))?");
+                        "\d+(?: \(Additional info: (.+)\))?")
     _PCWRE = re.compile("\[PCW\] #(.+) @ (.+) - (.+) - Requested a (\d+) vs "
-                        "\d+(?: \(Additional info: (.+)\))?");
+                        "\d+(?: \(Additional info: (.+)\))?")
     _RINGERRE = re.compile("\[RINGER\] #(.+) @ (.+) - (.+) - Requesting (\d+)"
-                           "(?: \(Additional info: (.+)\))");
+                           "(?: \(Additional info: (.+)\))")
+    _MSGRE = re.compile("\[MSG\] #(.+) @ (.+) - (.+) - (.+)")
 
     def on_chatmsg(self, ev):
         nick = ev.source.nick
@@ -106,5 +107,14 @@ class WarparsePlugin:
 
             self.write_to_database(3, user, channel, network, num, info)
             return
+        
+        match = self._MSGRE.match(message)
+        if match is not None:
+            channel = match.group(1)
+            network = match.group(2)
+            user = match.group(3)
+            num = 0
+            info = match.group(4)
 
-
+            self.write_to_database(5, user, channel, network, num, info)
+            return
