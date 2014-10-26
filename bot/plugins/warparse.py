@@ -65,13 +65,14 @@ class WarparsePlugin:
     _RINGERRE = re.compile("\[RINGER\] #(.+) @ (.+) - (.+) - Requesting (\d+)"
                            "(?: \(Additional info: (.+)\))")
     _MSGRE = re.compile("\[MSG\] #(.+) @ (.+) - (.+) - (.+)")
-
+    _RECRUITRE = re.compile("\[RECRUIT\] #(.+) @ (.+) - (.+) - Requesting (\d+)"
+                           "(?: \(Additional info: (.+)\))")
     def on_chatmsg(self, ev):
         nick = ev.source.nick
         message = ev.arguments[0]
 
         if nick[:6] != "warbot":
-            pass
+            return
 
         foundInfo = False
 
@@ -107,7 +108,18 @@ class WarparsePlugin:
 
             self.write_to_database(3, user, channel, network, num, info)
             return
-        
+
+        match = self._RECRUITRE.match(message)
+        if match is not None:
+            channel = match.group(1)
+            network = match.group(2)
+            user = match.group(3)
+            num = match.group(4)
+            info = match.group(5)
+
+            self.write_to_database(4, user, channel, network, num, info)
+            return
+
         match = self._MSGRE.match(message)
         if match is not None:
             channel = match.group(1)
