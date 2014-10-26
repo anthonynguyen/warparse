@@ -62,6 +62,8 @@ $result = $conn->query($q);
 						$tags = "<div class=\"tag\">$num vs $num</div>";
 					} else if ($type == 3) {
 						$tags = "<div class=\"tag\">Need: $num</div>";
+					} else if ($type == 4) {
+						$tags = "<div class=\"tag\">Recruiting: $num</div>";
 					}
 					
 					if ($row["info"] !== NULL) {
@@ -92,7 +94,8 @@ $result = $conn->query($q);
 						}
 					}
 					echo("<div class=\"tags\">$tags</div>");
-					echo("<div class=\"skill\">Skill: " . $skillStrings[$skill] . "</div>");
+					if ($type == 1 || $type == 2)
+						echo("<div class=\"skill\">Skill: " . $skillStrings[$skill] . "</div>");
 				}
 
 				$user = $row["user"];
