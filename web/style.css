@@ -1,0 +1,122 @@
+@import url(http://fonts.googleapis.com/css?family=Lato);
+@import url(http://fonts.googleapis.com/css?family=Montserrat);
+
+* {
+	border: 0;
+	margin: 0;
+	outline: 0;
+	padding: 0;
+}
+
+html {
+	background: #171c1a;
+    color: #f0f0f0;
+    font-family: "Lato", sans-serif;
+    font-size: 13pt;
+}
+
+#all {
+    margin: 3em auto 0;
+    width: 80%;
+}
+
+h1 {
+    font-family: "Montserrat", sans-serif;
+    margin-bottom: 1em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+ul {
+    list-style: none;
+}
+
+li {
+    /*background: hsl(156, 10%, 15%);*/
+    background: #222625;
+    border-radius: 0.3em;
+    margin-bottom: 2em;
+    min-height: 3em;
+    padding: 1.4em;
+    position: relative;
+}
+
+h2 {
+    display: block;
+    float: right;
+    font-family: "Montserrat";
+    font-size: 3em;
+    margin-right: -0.3em;
+    margin-top: -0.5em;
+    opacity: 0.1;
+    text-transform: uppercase;
+}
+
+.tags, .info {
+    margin-bottom: 0.8em;
+}
+
+.info {
+    background: #171c1a;
+    border-radius: 0.3em;
+    display: inline-block;
+    padding: 0.5em 1em
+}
+
+.tag {
+    background: #171c1a;
+    border-radius: 0.3em;
+    display: inline-block;
+    margin-bottom: 0.4em;
+    margin-right: 0.4em;
+    padding: 0.3em 0.5em;
+}
+
+.skill {
+    font-size: 0.9em;
+    margin-bottom: 0.4em;
+}
+
+.skill span {
+    background-color: #171c1a;
+    border-radius: 0.2em;
+    margin-left: 0.3em;
+    padding: 0.2em 0.4em;
+}
+
+.skill-high {
+    color: #f33f33;
+}
+
+.skill-medium {
+    color: #3377ff;
+}
+
+.skill-low {
+    color: #33f33f;
+}
+
+.skill-unknown {
+    color: #e3f331;
+}
+
+.contact {
+    color: #888;
+    font-size: 0.9em;
+}
+
+.user {
+    color: #ff8989;
+}
+
+.channel {
+    color: #f0f0f0;
+}
+
+.time {
+    font-size: 0.9em;
+    opacity: 0.5;
+    position: absolute;
+    right: 0.5em;
+    top: 3.3em;
+}

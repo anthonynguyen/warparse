@@ -13,3 +13,5 @@ dist/
 config.json
 warparse.json
 database/
+
+config.php
