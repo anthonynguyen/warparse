@@ -83,9 +83,6 @@ class WarparsePlugin:
             info = match.group(5)
 
             self.write_to_database(1, user, channel, network, num, info)
-
-            self.bot.say("CW: {} in #{} on {}. Wants {}. {}"
-                         .format(user, channel, network, num, info))
             return
 
         match = self._PCWRE.match(message)
@@ -97,9 +94,6 @@ class WarparsePlugin:
             info = match.group(5)
 
             self.write_to_database(2, user, channel, network, num, info)
-
-            self.bot.say("PCW: {} in #{} on {}. Wants {}. {}"
-                         .format(user, channel, network, num, info))
             return
 
         match = self._RINGERRE.match(message)
@@ -111,9 +105,6 @@ class WarparsePlugin:
             info = match.group(5)
 
             self.write_to_database(3, user, channel, network, num, info)
-
-            self.bot.say("Ringer: {} in #{} on {}. Wants {}. {}"
-                         .format(user, channel, network, num, info))
             return
 
 
