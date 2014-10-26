@@ -90,8 +90,8 @@ $result = $conn->query($q);
 
 							$tags .= "<div class=\"tag\">" . $t . "</div> ";
 						}
-						echo("<div class=\"tags\">$tags</div>");
 					}
+					echo("<div class=\"tags\">$tags</div>");
 					echo("<div class=\"skill\">Skill: " . $skillStrings[$skill] . "</div>");
 				}
 
