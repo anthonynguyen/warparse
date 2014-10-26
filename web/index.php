@@ -42,7 +42,11 @@ $result = $conn->query($q);
 
 				echo("<li><h2>" . $typeNames[$type] . "</h2>");
 				if ($type == 5) {
-					echo("<div class=\"info\">" . $row["info"] . "</div>");
+					$info = $row["info"];
+					$urlRegex = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+					if (preg_match($urlRegex, $info, $url))
+						$info = preg_replace($urlRegex, '<a href="'.$url[0].'" rel="nofollow">'.$url[0].'</a>', $info);
+					echo("<div class=\"info\">$info</div>");
 				} else {
 					/*
 					Skill:
