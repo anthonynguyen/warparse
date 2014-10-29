@@ -37,10 +37,11 @@ class WarparsePlugin:
         assert "db_user" in self.config
         assert "db_pass" in self.config
         assert "db_name" in self.config
+        assert "table" in self.config
 
         with DatabaseCursor(self.config) as c:
             c.execute("""
-                CREATE TABLE IF NOT EXISTS `warparse_logs` (
+                CREATE TABLE IF NOT EXISTS `{}` (
                     `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
                     `type` INTEGER NULL DEFAULT NULL,
                     `time` INTEGER NULL DEFAULT NULL,
@@ -51,7 +52,7 @@ class WarparsePlugin:
                     `info` VARCHAR(128) NULL DEFAULT NULL,
                     PRIMARY KEY (`id`)
                 );
-            """)
+            """.format(self.config["table"]))
 
     def shutdown(self):
         pass
@@ -65,11 +66,12 @@ class WarparsePlugin:
         # 5. Message
         with DatabaseCursor(self.config) as c:
             a = c.execute("""
-                INSERT INTO `warparse_logs` (
+                INSERT INTO `{}` (
                     `type`, `time`, `user`, `channel`, `network`, `num`, `info`
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s);
-                 """, [mtype, int(time.time()), user, channel, 
-                       network, int(num), info])
+                 """.format(self.config["table"]), 
+                [mtype, int(time.time()), user, channel, 
+                 network, int(num), info])
 
 
     _CWRE = re.compile("\[CW\] #(.+) @ (.+) - (.+) - Requested a (\d+) vs "

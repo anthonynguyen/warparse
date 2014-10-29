@@ -2,5 +2,6 @@
 "db_host": "127.0.0.1",
 "db_user": "username",
 "db_pass": "password",
-"db_name": "database_name"
+"db_name": "database_name",
+"table":   "table_name"
 }
