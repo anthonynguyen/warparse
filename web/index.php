@@ -2,7 +2,7 @@
 require("config.php");
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-$q = "SELECT * FROM `warparse_logs` ORDER BY `id` DESC LIMIT 100;";
+$q = "SELECT * FROM `" . TABLE . "` ORDER BY `id` DESC LIMIT 100;";
 $result = $conn->query($q);
 
 
