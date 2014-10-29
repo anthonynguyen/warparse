@@ -3,19 +3,12 @@ import time
 
 import pymysql
 
-class WarparsePlugin:
-    def __init__(self, bot):
-        self.bot = bot
 
-    def startup(self, config):
-        self.bot.registerEvent("public_message", self.on_chatmsg)
-
+class DatabaseCursor:
+    def __init__(self, config):
         self.config = config
-        assert "db_host" in config
-        assert "db_user" in config
-        assert "db_pass" in config
-        assert "db_name" in config
 
+    def __enter__(self):
         self.conn = pymysql.connect(
             host=self.config["db_host"],
             user=self.config["db_user"],
@@ -24,24 +17,44 @@ class WarparsePlugin:
         )
 
         self.cursor = self.conn.cursor()
-        self.cursor.execute("""
-            CREATE TABLE IF NOT EXISTS `warparse_logs` (
-                `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
-                `type` INTEGER NULL DEFAULT NULL,
-                `time` INTEGER NULL DEFAULT NULL,
-                `user` CHAR(24) NULL DEFAULT NULL,
-                `channel` CHAR(24) NULL DEFAULT NULL,
-                `network` CHAR(16) NULL DEFAULT NULL,
-                `num` INTEGER NULL DEFAULT NULL,
-                `info` VARCHAR(128) NULL DEFAULT NULL,
-                PRIMARY KEY (`id`)
-            );
-        """)
-        self.conn.commit()
+        return self.cursor
 
-    def shutdown(self):
+    def __exit__(self, type, value, traceback):
+        self.conn.commit()
         self.cursor.close()
         self.conn.close()
+
+
+class WarparsePlugin:
+    def __init__(self, bot):
+        self.bot = bot
+
+    def startup(self, config):
+        self.bot.registerEvent("public_message", self.on_chatmsg)
+
+        self.config = config
+        assert "db_host" in self.config
+        assert "db_user" in self.config
+        assert "db_pass" in self.config
+        assert "db_name" in self.config
+
+        with DatabaseCursor(self.config) as c:
+            c.execute("""
+                CREATE TABLE IF NOT EXISTS `warparse_logs` (
+                    `id` INTEGER NULL AUTO_INCREMENT DEFAULT NULL,
+                    `type` INTEGER NULL DEFAULT NULL,
+                    `time` INTEGER NULL DEFAULT NULL,
+                    `user` CHAR(24) NULL DEFAULT NULL,
+                    `channel` CHAR(24) NULL DEFAULT NULL,
+                    `network` CHAR(16) NULL DEFAULT NULL,
+                    `num` INTEGER NULL DEFAULT NULL,
+                    `info` VARCHAR(128) NULL DEFAULT NULL,
+                    PRIMARY KEY (`id`)
+                );
+            """)
+
+    def shutdown(self):
+        pass
 
     def write_to_database(self, mtype, user, channel, network, num, info):
         # Types:
@@ -50,12 +63,13 @@ class WarparsePlugin:
         # 3. Ringer
         # 4. Recruit
         # 5. Message
-        a = self.cursor.execute("""
-            INSERT INTO `warparse_logs` (
-                `type`, `time`, `user`, `channel`, `network`, `num`, `info`
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s);
-        """, [mtype, int(time.time()), user, channel, network, int(num), info])
-        self.conn.commit()
+        with DatabaseCursor(self.config) as c:
+            a = c.execute("""
+                INSERT INTO `warparse_logs` (
+                    `type`, `time`, `user`, `channel`, `network`, `num`, `info`
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s);
+                 """, [mtype, int(time.time()), user, channel, 
+                       network, int(num), info])
 
 
     _CWRE = re.compile("\[CW\] #(.+) @ (.+) - (.+) - Requested a (\d+) vs "
