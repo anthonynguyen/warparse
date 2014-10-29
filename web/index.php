@@ -34,7 +34,8 @@ $result = $conn->query($q);
 			"ctf" => "Capture the Flag",
 			"bomb" => "Bomb Mode",
 			"hs" => "Have Server",
-			"ns" => "Need Server"
+			"ns" => "Need Server",
+			"avi" => "Available"
 		);
 		if ($result->num_rows > 0) {
 			while($row = $result->fetch_assoc()) {
@@ -58,42 +59,48 @@ $result = $conn->query($q);
 					$skill = 0;
 					$skillStrings = array("<span class=\"skill-unknown\">Unknown</span>", "<span class=\"skill-low\">Low</span>", "<span class=\"skill-medium\">Medium</span>", "<span class=\"skill-high\">High</span>");
 					$num = $row["num"];
+					$tags = array();
 					if ($type == 1 || $type == 2) {
-						$tags = "<div class=\"tag\">$num vs $num</div>";
+						$tags[] = "<div class=\"tag\">$num vs $num</div>";
 					} else if ($type == 3) {
-						$tags = "<div class=\"tag\">Need: $num</div>";
+						$tags[] = "<div class=\"tag\">Need: $num</div>";
 					} else if ($type == 4) {
-						$tags = "<div class=\"tag\">Recruiting: $num</div>";
+						$tags[] = "<div class=\"tag\">Recruiting: $num</div>";
 					}
 					
 					if ($row["info"] !== NULL) {
 						$rawTags = explode(" ", $row["info"]);
 						
 						foreach($rawTags as $tag) {
+							$t = strtolower($tag);
 							if ($tag === "")
 								continue;
 
-							if ($tag == "high") {
+							if ($t == "high") {
 								$skill = 3;
 								continue;
-							} else if ($tag == "med" || $tag == "medium" || $tag == "mid") {
+							} else if ($t == "med" || $t == "medium" || $t == "mid") {
 								$skill = 2;
 								continue;
-							} else if ($tag == "low") {
+							} else if ($t == "low") {
 								$skill = 1;
 								continue;
 							}
 
-							$t = strtolower($tag);
+							if ($t == "avi" || $t == "available") {
+								$tags[0] = "<div class=\"tag\">Available: $num</div>";
+								continue;
+							}
+
 							if (array_key_exists($t, $tagMap))
 								$t = $tagMap[$t];
 							else
 								$t = ucfirst($t);
 
-							$tags .= "<div class=\"tag\">" . $t . "</div> ";
+							$tags[] = "<div class=\"tag\">" . $t . "</div>";
 						}
 					}
-					echo("<div class=\"tags\">$tags</div>");
+					echo("<div class=\"tags\">" . implode("", $tags) . "</div>");
 					if ($type == 1 || $type == 2)
 						echo("<div class=\"skill\">Skill: " . $skillStrings[$skill] . "</div>");
 				}
@@ -106,9 +113,9 @@ $result = $conn->query($q);
 				$time = $row["time"];
 				$tdelta = time() - $time;
 				$minutes = $tdelta / 60;
-				if ($minutes > 59) {
+				if ($minutes >= 60) {
 					$hours = $minutes / 60;
-					if ($hours > 23) {
+					if ($hours >= 24) {
 						$days = $hours / 24;
 						$timestring = strval((int)$days) . " day" . ((int)$days == 1 ? "" : "s") . " ago";
 					} else {
@@ -116,6 +123,8 @@ $result = $conn->query($q);
 					}
 				} else {
 					$timestring = strval((int)$minutes) . " minute" . ((int)$minutes == 1 ? "" : "s") . " ago";
+					if ((int)$minutes == 0)
+						$timestring = "Just now";
 				}
 				echo("<div class=\"time\">$timestring</div>");
 			}
