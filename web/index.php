@@ -2,18 +2,23 @@
 require("config.php");
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
+$types = "0, 1, 2, 3, 4, 5";
+if (isset($_GET["type"])) {
+	$type = intval($_GET["type"]);
+	if ($type > 0 && $type < 6)
+		$types = "$type";
+}
+
 $failed = False;
 if ($conn->connect_errno) {
 	$failed = True;
 } else {
-	$q = "SELECT * FROM `" . TABLE . "` ORDER BY `id` DESC LIMIT 100;";
+	$q = "SELECT * FROM `" . TABLE . "` WHERE `type` IN ($types) ORDER BY `id` DESC LIMIT 100;";
 	$result = $conn->query($q);
 
 	if (!$result)
 		$failed = True;
 }
-
-
 
 ?>
 <!DOCTYPE html>
@@ -30,6 +35,34 @@ if ($conn->connect_errno) {
 		die("<h1>Could not connect to database.</h1></body></html>");
 	?>
 	<h1>Urban Terror Warbot</h1>
+	<ul id="filter">
+		<?php
+		$typeNames = array("all", "cw", "pcw", "ringer", "recruit", "msg");
+
+		$links = "";
+
+		$typeLinks = array(
+			$_SERVER["PHP_SELF"],
+			"?type=1",
+			"?type=2",
+			"?type=3",
+			"?type=4",
+			"?type=5"
+		);
+
+		foreach ($typeLinks as $i => $tl) {
+			if (($i == 0 && $types == "0, 1, 2, 3, 4, 5") || $i == $types)
+				$links .= "<li class=\"active\">";
+			else
+				$links .= "<li>";
+
+			$links .= "<a href=\"$tl\">" . $typeNames[$i] . "</a></li>";
+		}
+
+		
+		echo($links);
+		?>
+	</ul>
 	<ul id="list">
 		<?php
 		/*
@@ -40,7 +73,6 @@ if ($conn->connect_errno) {
 		4. Recruit
 		5. Message
 		*/
-		$typeNames = array("", "cw", "pcw", "ringer", "recruit", "msg");
 
 		$tagMap = array(
 			"ts" => "Team Survivor",
