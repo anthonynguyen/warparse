@@ -2,8 +2,17 @@
 require("config.php");
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-$q = "SELECT * FROM `" . TABLE . "` ORDER BY `id` DESC LIMIT 100;";
-$result = $conn->query($q);
+$failed = False;
+if ($conn->connect_errno) {
+	$failed = True;
+} else {
+	$q = "SELECT * FROM `" . TABLE . "` ORDER BY `id` DESC LIMIT 100;";
+	$result = $conn->query($q);
+
+	if (!$result)
+		$failed = True;
+}
+
 
 
 ?>
@@ -16,6 +25,10 @@ $result = $conn->query($q);
 </head>
 <body>
 <div id="all">
+	<?php
+	if ($failed)
+		die("<h1>Could not connect to database.</h1></body></html>");
+	?>
 	<h1>Urban Terror Warbot</h1>
 	<ul id="list">
 		<?php
